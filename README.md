@@ -1,12 +1,19 @@
-JOBCONNECT — HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY WEBSITE
-Áp dụng cho: JobConnect_Admin_Khoa_MoKhoa_Xoa_TaiKhoan_Python_MySQL.zip (bản tích hợp Frontend + Backend FastAPI + MySQL).
+JobConnect — Hướng dẫn cài đặt và chạy website
+Dự án sử dụng HTML, CSS, JavaScript cho Frontend, Python FastAPI cho Backend và MySQL để lưu trữ dữ liệu.
 
-Website chạy cùng một địa chỉ http://127.0.0.1:8000/: Python FastAPI phục vụ giao diện HTML/CSS/JavaScript và API; MySQL lưu dữ liệu. Không cần PHP, XAMPP, Live Server, Docker hoặc chạy file .bat. Tuy nhiên, MySQL Server phải được cài và đang hoạt động.
-1. Yêu cầu trước khi chạy
-- Windows, VS Code, Python (kiểm tra bằng py --version).
-- MySQL Server cài riêng, có thể dùng MySQL Workbench để quản lý database.
-- Giải nén ZIP; cấu trúc thư mục chính:
+Frontend và Backend hoạt động trên cùng một địa chỉ website:
+
+http://127.0.0.1:8000/
+Không cần PHP, XAMPP, Docker, Live Server hoặc file .bat. Tuy nhiên, bạn vẫn cần cài và khởi động MySQL Server riêng.
+
+1. Yêu cầu cài đặt
+Cần có:
+- VS Code
+- Python (kiểm tra bằng lệnh py --version)
+- MySQL Server (có thể dùng MySQL Workbench để quản lý)
+Cấu trúc thư mục
 JobConnect_Python_MySQL_Mot_Trang_Web/
+│
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
@@ -15,6 +22,7 @@ JobConnect_Python_MySQL_Mot_Trang_Web/
 │   ├── api-bridge.js
 │   ├── theme.js
 │   └── images/
+│
 └── Backend/
     ├── .env.example
     ├── main.py
@@ -25,74 +33,117 @@ JobConnect_Python_MySQL_Mot_Trang_Web/
     ├── init_db.py
     ├── seed_demo.py
     └── requirements.txt
-2. Bật MySQL và tạo database (lần đầu)
-Khởi động dịch vụ MySQL Server trong Windows Services (tên có thể là MySQL80, MySQL84 hoặc tên khác), hoặc dùng MySQL Workbench kiểm tra kết nối. Sau đó chạy câu lệnh SQL:
-CREATE DATABASE IF NOT EXISTS job_portal
-CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-Lưu ý: Database job_portal phải tồn tại trước khi chạy init_db.py. Không xóa database có dữ liệu thật.
-3. Tạo và chỉnh file .env (lần đầu)
-Mở VS Code tại thư mục dự án. Vào Terminal → New Terminal; nếu Terminal chưa ở Backend, chạy:
-cd Backend
-Sao chép mẫu cấu hình:
-Copy-Item .env.example .env
-Mở file Backend/.env (không chỉ sửa .env.example) và chỉnh theo tài khoản MySQL thực tế:
-DATABASE_URL=mysql+pymysql://root:MAT_KHAU_MYSQL@127.0.0.1:3306/job_portal
-JOB_SECRET_KEY=THAY_BANG_CHUOI_BI_MAT_NGAU_NHIEN_DAI
-- Thay MAT_KHAU_MYSQL bằng mật khẩu thật. Nếu root không có mật khẩu, dùng mysql+pymysql://root@127.0.0.1:3306/job_portal.
-- Nếu mật khẩu có ký tự đặc biệt (@, #, %, ...), cần URL-encode trong chuỗi kết nối.
-- Giữ .env riêng tư, không upload lên GitHub. Không đăng ảnh hoặc dán mật khẩu lên mạng.
-- Kiểm tra file .env ở cùng thư mục với database.py, không phải .env.txt.
-Kiểm tra cấu hình đã được đọc (không in mật khẩu):
-.\.venv\Scripts\python.exe -c "from dotenv import load_dotenv; import os; load_dotenv(); print('OK' if os.getenv('DATABASE_URL') else 'THIEU DATABASE_URL')"
-Chỉ thực hiện lệnh kiểm tra trên sau khi đã tạo .venv ở bước 4.
-4. Cài Python và khởi tạo dữ liệu (lần đầu)
-Tại Terminal trong Backend:
-py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe init_db.py
-init_db.py tạo các bảng còn thiếu, không tự nâng cấp các bảng cũ. Nếu database đã tồn tại từ bản khác, hãy sao lưu và so sánh schema trước khi thay đổi.
+2. Khởi động MySQL và tạo database (chỉ làm lần đầu)
+Bước 1. Bật dịch vụ MySQL Server trên Windows.
 
-Nếu cần dữ liệu và tài khoản mẫu để kiểm thử trên database thử nghiệm, chạy:
+Tên dịch vụ có thể là MySQL80, MySQL84 hoặc tên khác theo bản cài đặt.
+
+Bước 2. Mở MySQL Workbench (hoặc công cụ quản lý MySQL bạn đang sử dụng), rồi thực thi:
+CREATE DATABASE IF NOT EXISTS job_portal
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+Nếu đã có database job_portal chứa dữ liệu, không xóa database đó.
+
+3. Cấu hình kết nối MySQL (chỉ làm lần đầu)
+Bước 1. Mở thư mục dự án trong VS Code.
+
+Mở Terminal → New Terminal, sau đó chuyển tới thư mục Backend:
+cd Backend
+Bước 2. Sao chép file cấu hình mẫu thành .env:
+Copy-Item .env.example .env
+Bước 3. Mở file Backend/.env vừa tạo và chỉnh nội dung theo tài khoản MySQL trên máy của bạn:
+DATABASE_URL=mysql+pymysql://root:MAT_KHAU_MYSQL@127.0.0.1:3306/job_portal
+JOB_SECRET_KEY=THAY_BANG_CHUOI_NGAU_NHIEN_DAI_VA_BI_MAT
+Trong đó:
+- root: tên tài khoản MySQL (chỉ là ví dụ).
+- MAT_KHAU_MYSQL: thay bằng mật khẩu MySQL của bạn.
+- 127.0.0.1: máy chạy MySQL.
+- 3306: cổng MySQL mặc định.
+- job_portal: tên database.
+Nếu tài khoản root không có mật khẩu, dùng dạng:
+DATABASE_URL=mysql+pymysql://root@127.0.0.1:3306/job_portal
+Nếu mật khẩu chứa ký tự đặc biệt như @, #, %, cần mã hóa URL trước khi đưa vào DATABASE_URL.
+
+Không đẩy file .env lên GitHub. Đảm bảo tên là .env, không phải .env.txt hoặc chỉ chỉnh .env.example.
+
+4. Cài thư viện Python và tạo bảng (chỉ làm lần đầu)
+Mở Terminal trong thư mục Backend.
+Bước 1. Tạo môi trường Python
+py -m venv .venv
+Bước 2. Cài thư viện dự án
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Bước 3. Kiểm tra Python đọc được .env
+.\.venv\Scripts\python.exe -c "from dotenv import load_dotenv; import os; load_dotenv(); print('OK' if os.getenv('DATABASE_URL') else 'THIEU DATABASE_URL')"
+Nếu hiện OK, tiếp tục bước sau. Nếu hiện THIEU DATABASE_URL, kiểm tra lại mục 3.
+Bước 4. Tạo bảng trong MySQL
+.\.venv\Scripts\python.exe init_db.py
+init_db.py tạo bảng còn thiếu nhưng không tự sửa cấu trúc các bảng cũ. Nếu database có sẵn từ bản khác, hãy sao lưu và kiểm tra cấu trúc trước.
+
+Bước 5. Tạo dữ liệu và tài khoản demo (không bắt buộc)
+Chỉ dùng trên database thử nghiệm:
 .\.venv\Scripts\python.exe seed_demo.py
-Không chạy dữ liệu mẫu trên database thật đang được sử dụng.
-5. Khởi động cả Frontend và Backend bằng một lệnh
-Mỗi lần mở website: bảo đảm MySQL Server đang chạy. Mở Terminal tại thư mục Backend và chạy:
+Không nên chạy dữ liệu mẫu trên database thật đang sử dụng.
+5. Chạy website (mỗi lần sử dụng)
+Bước 1. Đảm bảo MySQL Server đang chạy.
+
+Bước 2. Mở VS Code và chuyển Terminal vào thư mục Backend nếu chưa ở đó:
+cd Backend
+Bước 3. Chạy FastAPI:
 .\.venv\Scripts\python.exe -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
-Đợi Terminal hiện tương tự:
+Khi chạy thành công, Terminal thường hiện:
 Uvicorn running on http://127.0.0.1:8000
-Mở trình duyệt: http://127.0.0.1:8000/
-- Website JobConnect: http://127.0.0.1:8000/
-- Tài liệu API FastAPI: http://127.0.0.1:8000/docs
-- Kiểm tra sức khỏe API: http://127.0.0.1:8000/health
-FastAPI phục vụ luôn Frontend; không cần mở index.html bằng Live Server. Giữ Terminal đang chạy để tiếp tục sử dụng web. Nhấn Ctrl + C trong Terminal để dừng máy chủ.
+Bước 4. Mở trình duyệt tại:
+
+http://127.0.0.1:8000/
+
+Các địa chỉ quan trọng:
+Địa chỉ	Chức năng
+http://127.0.0.1:8000/	Website JobConnect
+http://127.0.0.1:8000/docs	Tài liệu API FastAPI
+http://127.0.0.1:8000/health	Kiểm tra trạng thái API (nếu bản Backend hỗ trợ)
+
+
+Không cần mở index.html bằng Live Server. FastAPI đã phục vụ cả giao diện và API.
+
+Giữ Terminal chạy trong lúc dùng website. Muốn dừng máy chủ, nhấn Ctrl + C ở Terminal.
 6. Kiểm tra chức năng
-1. Mở trang chủ, tìm kiếm việc làm.
-2. Tự đăng ký tài khoản Ứng viên (mật khẩu ít nhất 8 ký tự).
+Sau khi vào website:
+1. Mở trang chủ và tìm việc làm.
+2. Đăng ký tài khoản Ứng viên (mật khẩu tối thiểu 8 ký tự).
 3. Đăng nhập, lưu việc và nộp đơn ứng tuyển.
-4. Đăng nhập tài khoản Nhà tuyển dụng mẫu (nếu đã seed) để đăng tin.
-5. Đăng nhập Admin → Quản trị → Quản lý tài khoản để xem người dùng và thử Khóa/Mở khóa/Xóa trên tài khoản thử nghiệm; sao lưu DB trước khi thử Xóa.
-6. Vào Kiểm duyệt tin để duyệt tin đang chờ.
-Tài khoản demo (chỉ khi seed_demo.py tạo thành công trên database thử nghiệm):
+4. Đăng nhập Nhà tuyển dụng để đăng tin và theo dõi ứng viên.
+5. Đăng nhập Admin, mở Quản trị → Quản lý tài khoản để xem danh sách, Khóa/Mở khóa hoặc Xóa tài khoản thử nghiệm.
+6. Vào Kiểm duyệt tin để duyệt tin tuyển dụng đang chờ.
+Tài khoản demo
+Chỉ có nếu đã chạy seed_demo.py thành công:
 Vai trò	Email	Mật khẩu
 Admin	admin@demo.vn	123456
 Nhà tuyển dụng	recruiter@demo.vn	123456
 
 
-Tài khoản ứng viên tự đăng ký trên website.
-7. Lỗi thường gặp
-Thông báo / hiện tượng	Cách xử lý
-Expected string or URL object, got None	Chưa có Backend/.env hoặc thiếu dòng DATABASE_URL; chỉ chỉnh .env.example là chưa đủ.
-Access denied for user	Sai tài khoản hoặc mật khẩu MySQL trong .env.
-Unknown database 'job_portal'	Chưa tạo database ở bước 2.
-Can't connect to MySQL server	MySQL Server chưa chạy, sai host hoặc sai cổng.
-ModuleNotFoundError	Cài lại thư viện bằng .\.venv\Scripts\python.exe -m pip install -r requirements.txt.
-Address already in use	Cổng 8000 đang được chương trình khác sử dụng; dừng tiến trình cũ trước khi chạy lại.
-Giao diện vẫn ghi DỮ LIỆU DEMO, không có nút Khóa/Xóa	Kiểm tra đã mở đúng bản ZIP mới ở cổng 8000, không phải thư mục Frontend cũ hoặc Live Server; thử Ctrl + Shift + R.
-Khóa/Xóa không hoạt động	Kiểm tra đã đăng nhập Admin qua Backend và MySQL đang chạy; mở Developer Tools (F12) → Network để xem yêu cầu API bị lỗi.
+Ứng viên có thể tự đăng ký.
+Trước khi thử Xóa tài khoản, hãy sao lưu database. Không dùng tài khoản hoặc dữ liệu cá nhân thật để thử nghiệm.
 
-
+7. Cách xử lý lỗi thường gặp
+Lỗi Expected string or URL object, got None
+Python chưa đọc được DATABASE_URL. Kiểm tra file Backend/.env đã tồn tại và có dòng DATABASE_URL=... đúng chưa.
+Lỗi Access denied for user
+Sai tài khoản hoặc mật khẩu MySQL. Kiểm tra DATABASE_URL trong .env.
+Lỗi Unknown database 'job_portal'
+Chưa tạo database. Thực hiện lại mục 2.
+Lỗi Can't connect to MySQL server
+MySQL Server chưa bật, hoặc host/cổng trong .env không đúng.
+Lỗi ModuleNotFoundError
+Chạy lại lệnh cài thư viện:
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Lỗi Address already in use
+Cổng 8000 đang được tiến trình khác sử dụng. Dừng máy chủ cũ rồi chạy lại.
+Trang vẫn ghi DỮ LIỆU DEMO hoặc chưa có nút Khóa/Xóa
+Kiểm tra đã mở đúng thư mục dự án mới và truy cập địa chỉ http://127.0.0.1:8000/, không phải Live Server hay bản Frontend cũ. Nhấn Ctrl + Shift + R để làm mới trang.
+Nút Khóa/Xóa không hoạt động
+Kiểm tra tài khoản đã đăng nhập có quyền Admin, MySQL đang chạy và các API tương ứng có mặt tại /docs.
 8. Lưu ý
-- Đây là bản tích hợp dành cho học tập và demo trên máy cá nhân. Chưa kiểm thử trực tiếp trên môi trường MySQL của mọi máy.
-- Chức năng CV PDF và thư giới thiệu có thể vẫn lưu ở phía trình duyệt; không xem đó là chức năng upload file thật lên máy chủ.
-- Chưa có chức năng Gmail xác minh hoặc quên mật khẩu qua email.
-- Không đưa .env, mật khẩu, khóa bí mật, dữ liệu cá nhân hoặc database thật lên GitHub.
+- Đây là dự án phục vụ học tập và kiểm thử cục bộ.
+- CV PDF có thể vẫn được lưu trong trình duyệt, chưa phải tải lên Backend.
+- Chưa có chức năng xác minh Gmail và đặt lại mật khẩu qua email.
+- Không đưa .env, mật khẩu, khóa bí mật hay dữ liệu người dùng thật lên GitHub.
